@@ -1,0 +1,18 @@
+[
+    {
+        "countryCode": "IN",
+        "label": "India",
+        "value": "INR",
+        "population": "1173108018",
+        "capital": "New Delhi",
+        "continentName": "Asia"
+    },
+    {
+        "countryCode": "US",
+        "label": "United States",
+        "value": "USD",
+        "population": "310232863",
+        "capital": "Washington",
+        "continentName": "North America"
+    }
+]
