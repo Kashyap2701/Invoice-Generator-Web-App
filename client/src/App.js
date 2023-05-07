@@ -1,6 +1,3 @@
-
-//Copyright (c) 2022 Panshak Solomon
-
 import React from 'react'
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
 import SnackbarProvider from 'react-simple-snackbar'
@@ -12,11 +9,12 @@ import ClientList from './components/Clients/ClientList'
 import NavBar from './components/NavBar/NavBar';
 import Login from './components/Login/Login'
 import Dashboard from './components/Dashboard/Dashboard';
-import Footer from './components/Footer/Footer';
+// import Footer from './components/Footer/Footer';
 import Header from './components/Header/Header';
 import Settings from './components/Settings/Settings';
 import Forgot from './components/Password/Forgot'
 import Reset from './components/Password/Reset'
+import Products from './components/Products/Products';
 
 function App() {
 
@@ -38,12 +36,11 @@ function App() {
           <Route path="/settings" exact component={Settings} />
           <Route path="/dashboard" exact component={Dashboard} />
           <Route path="/customers" exact component={ClientList} />
+          <Route path="/products" exact component={Products} />
           <Route path="/forgot" exact component={Forgot} />
           <Route path="/reset/:token" exact component={Reset} />
           <Redirect exact from="/new-invoice" to="/invoice" />
-
         </Switch>
-        {/* <Footer /> */}
         </SnackbarProvider>
       </BrowserRouter>
     </div>

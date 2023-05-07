@@ -6,10 +6,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getInvoicesByUser } from '../../actions/invoiceActions'
 import Empty from '../svgIcons/Empty'
 import Chart from './Chart'
-// import Donut from './Donut'
 import moment from 'moment'
 import { Check, Pie, Bag, Card, Clock, Frown } from './Icons'
 import Spinner from '../Spinner/Spinner'
+import FabButton from '../Fab/Fab'
 
 
 const Dashboard = () => {
@@ -19,7 +19,6 @@ const Dashboard = () => {
     const dispatch = useDispatch()
     const user = JSON.parse(localStorage.getItem('profile'))
     const { invoices, isLoading } = useSelector((state) => state?.invoices)
-    // const unpaid = invoices?.filter((invoice) => (invoice.status === 'Unpaid') || (invoice.status === 'Partial'))
     const overDue = invoices?.filter((invoice) => invoice.dueDate <= new Date().toISOString())
 
 
@@ -32,7 +31,6 @@ const Dashboard = () => {
         }
         
     }
-
 
     //sort payment history by date
    const sortHistoryByDate =  paymentHistory.sort(function(a, b) {
@@ -88,13 +86,12 @@ const Dashboard = () => {
       
     return (
         <div className={styles.pageContainer}>
-           
-    
+        
             <section className={styles.stat}>
             <ul className={styles.autoGrid}>
                         <li className={styles.listItem} style={{backgroundColor: '#1976d2', color: 'white'}}>
                             <div>
-                                <p>{toCommas(totalPaid)}</p>
+                                <p>{toCommas(totalPaid.toFixed(2))}</p>
                                 <h2 style={{color: 'white'}}>Payment Received</h2>
                             </div>
                             <div>
@@ -104,7 +101,7 @@ const Dashboard = () => {
 
                         <li className={styles.listItem} >
                             <div>
-                                <p>{toCommas(totalAmount - totalPaid)}</p>
+                                <p>{toCommas((totalAmount - totalPaid).toFixed(2))}</p>
                                 <h2>Pending Amount</h2>
                             </div>
                             <div>
@@ -114,7 +111,7 @@ const Dashboard = () => {
 
                         <li className={styles.listItem} >
                             <div>
-                                <p>{toCommas(totalAmount)}</p>
+                                <p>{toCommas(totalAmount.toFixed(2))}</p>
                                 <h2>Total Amount</h2>
                             </div>
                             <div>
@@ -218,7 +215,7 @@ const Dashboard = () => {
                     </div>
                     </div>
                 </section>
-           
+           <FabButton/>
         </div>
     )
 }

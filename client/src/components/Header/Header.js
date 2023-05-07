@@ -38,17 +38,6 @@ const Header = () => {
         setUser(JSON.parse(localStorage.getItem('profile')))
     },[location])
 
-    
-    //GET REPO INFO FROM GITHUB
-    // useEffect(() => {
-    //   getMetaData()
-    // },[])
-
-
-    // const getMetaData = async() => {
-    //   const response = await axios.get('https://api.github.com/repos/panshak/arc')
-    //       // console.log(response.data);
-    // }
 
     const logout =() => {
         dispatch({ type: 'LOGOUT' })
@@ -111,9 +100,6 @@ const Header = () => {
     prevOpen.current = open;
   }, [open]);
 
-
-
-
     if(!user) return (
         <div className={styles.header2}>
          <img style={{width: '50px', cursor: 'pointer'}} onClick={()=> history.push('/')} src="https://cdn4.iconfinder.com/data/icons/shopping-216/512/invoice-512.png" alt="arc-invoice" />
@@ -123,7 +109,7 @@ const Header = () => {
     return (
         <div className={styles.header}>
             <div className={classes.root}>
-      <div>
+            <div>
         <Button
           ref={anchorRef}
           aria-controls={open ? 'menu-list-grow' : undefined}

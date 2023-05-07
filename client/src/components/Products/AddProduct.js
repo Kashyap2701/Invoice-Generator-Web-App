@@ -1,5 +1,5 @@
- /* eslint-disable */
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect} from 'react';
+import { useLocation } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -10,10 +10,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
-import { useDispatch } from 'react-redux'
-import { createClient } from '../../actions/clientActions'
-import { useLocation } from 'react-router-dom';
-
+import { useDispatch, useSelector } from 'react-redux'
+import { createClient, updateClient } from '../../actions/clientActions'
 import { useSnackbar } from 'react-simple-snackbar'
 
 const styles = (theme) => ({
@@ -47,7 +45,7 @@ const DialogTitle = withStyles(styles)((props) => {
 
 const DialogContent = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(4),
+    padding: theme.spacing(3),
   },
 }))(MuiDialogContent);
 
@@ -58,89 +56,54 @@ const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-const AddClient = ({ setOpen, open }) => {
+function AddProduct() {
 
-    const location = useLocation()
-    const [clientData, setClientData] = useState({ name: '', email: '', phone: '', address: '', userId: [] })
-    const dispatch = useDispatch()
-    const user = JSON.parse(localStorage.getItem('profile'))
-       // eslint-disable-next-line 
-    const [openSnackbar, closeSnackbar] = useSnackbar()
-    const [error,setError] = useState(null);
+  const location = useLocation()
+  const [productData, setProductData] = useState({ name: '', price: '', userId: ''});
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
+  const dispatch = useDispatch()
+  const product = useSelector((state)=> currentId ? state.product.product.find((p) => p._id === currentId) : null)
+  // eslint-disable-next-line 
+  const [openSnackbar, closeSnackbar] = useSnackbar()
+
+
+    useEffect(() => {
+      if(product) {
+        setProductData(product)
+      }
+    }, [product])
+
+    useEffect(() => {
+      setUser(JSON.parse(localStorage.getItem('profile')))
+      // setClientData({...clientData, userId: user?.result?._id})
+    },[location])
+
 
     useEffect(() => {
       var checkId = user?.result?._id
       if(checkId !== undefined) {
-        setClientData({...clientData, userId: [checkId]})
+        setProductData({...productData, userId: [checkId]})
       } else {
-        setClientData({...clientData, userId: [user?.result?.googleId]})
+        setProductData({...productData, userId: [user?.result?.googleId]})
       }
+      
     },[location])
 
-    const errorMessage = {
-        backgroundColor: "#fce4e4",
-        border: "1px solid #fcc2c3",
-        padding: "5px",
-        position:'absolute',
-        right: '0',
-        marginRight: '30px'
-    }
-
-    const errorText = {
-      color: "#cc0033",
-      fontFamily: "Helvetica, Arial, sans-serif",
-      fontSize: "13px",
-      fontWeight: "bold",
-      lineHeight: "20px",
-      textShadow: "1px 1px rgba(250,250,250,.3)"
-    }
-   
-    function isValidClient() {
-      // Check if name is not empty
-      if (clientData.name.length==0) {
-        setError('Please enter a name');
-        return false;
-      }
-      
-      // Check if phone is a valid phone number (can have only digits, spaces, dashes, and parentheses)
-      if (!/^[0-9 ()+-]{10}$/.test(clientData.phone)) {
-          setError('Please enter a valid 10-digit phone number')
-        return false;
-      }
-      
-      // Check if email is a valid email address
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientData.email)) {
-        setError('Please enter a valid email address')
-        return false;
-      }
-      
-      if(clientData.address.length==0){
-        setError("Please enter a valid email address");
-        return false;
-      }
-
-      // All fields are valid
-      return true;
-    }
-    
 
     const handleSubmitClient =(e)=> {
         e.preventDefault()
-
-        if(isValidClient()){
-          dispatch(createClient(clientData, openSnackbar))
-          clear()
-          handleClose()
-        }
-        else{
-          setTimeout(() => {
-            setError(null);
-          }, 3000);
+        if(currentId) {
+          dispatch(updateClient(currentId, clientData, openSnackbar))
+        } else {
+          dispatch(createClient(productData, openSnackbar))
         }
         
+        clear()
+        handleClose()
     }
 
   const clear =() => {
+    setCurrentId(null) 
     setClientData({ name: '', email: '', phone: '', address: '', userId: [] })
   }
     
@@ -148,49 +111,41 @@ const AddClient = ({ setOpen, open }) => {
     setOpen(false);
   };
 
-
   const inputStyle = {
-      display: "block",
-      padding: "1.4rem 0.75rem",
-      width: "100%",
-      fontSize: "0.8rem",
-      lineHeight: 1.25,
-      color: "#55595c",
-      backgroundColor: "#fff",
-      backgroundImage: "none",
-      backgroundClip: "padding-box",
-      borderTop: "0",
-      borderRight: "0",
-      borderBottom: "1px solid #eee",
-      borderLeft: "0",
-      borderRadius: "3px",
-      transition: "all 0.25s cubic-bezier(0.4, 0, 1, 1)"
-  }
+    display: "block",
+    padding: "1.4rem 0.75rem",
+    width: "100%",
+    fontSize: "0.8rem",
+    lineHeight: 1.25,
+    color: "#55595c",
+    backgroundColor: "#fff",
+    backgroundImage: "none",
+    backgroundClip: "padding-box",
+    borderTop: "0",
+    borderRight: "0",
+    borderBottom: "1px solid #eee",
+    borderLeft: "0",
+    borderRadius: "3px",
+    transition: "all 0.25s cubic-bezier(0.4, 0, 1, 1)"
+}
 
-  const focus = {
-    "input:focus, textarea:focus": { outline: "0", borderBottomColor: "#ffab00" }
-  }
-  console.log(clientData);
 
   return (
     <div>
-        <div>
+        <form >
       <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open} fullWidth>
             <DialogTitle id="customized-dialog-title" onClose={handleClose} style={{paddingLeft: '20px', color: 'white'}}>
-                New Customer
+            {currentId? 'Edit Customer' : 'Add new Client'}
             </DialogTitle>
             <DialogContent dividers>
-          {error && (<div className='cutsomeError'style={errorMessage}>
-              <span style={errorText}>{error}</span>
-          </div>)}
 
-          <div className="customInputs">
+
+            <div className="customInputs">
               <input 
                 placeholder="Name" 
                 style={inputStyle} 
                 name='name' 
                 type='text'  
-                required
                 onChange={(e) => setClientData({...clientData, name: e.target.value})}
                 value={clientData.name} 
               />
@@ -199,20 +154,20 @@ const AddClient = ({ setOpen, open }) => {
                 placeholder="Email" 
                 style={inputStyle} 
                 name='email' 
-                type='email'
-                required 
+                type='text' 
                 onChange={(e) => setClientData({...clientData, email: e.target.value})}
                 value={clientData.email} 
               />
+
               <input 
                 placeholder="Phone" 
                 style={inputStyle} 
                 name='phone' 
-                type='number'
-                required  
+                type='text'  
                 onChange={(e) => setClientData({...clientData, phone: e.target.value})}
                 value={clientData.phone} 
               />
+
               <input 
                 placeholder="Address" 
                 style={inputStyle} 
@@ -225,14 +180,14 @@ const AddClient = ({ setOpen, open }) => {
 
             </DialogContent>
             <DialogActions>
-            <Button autoFocus onClick={handleSubmitClient} variant="contained" style={{marginRight: '25px'}} >
+            <Button  onClick={handleSubmitClient}  variant="contained" style={{marginRight: '25px'}} >
                 Save Customer
             </Button>
             </DialogActions>
       </Dialog>
-        </div>
+        </form>
     </div>
   );
 }
 
-export default AddClient
+export default AddProduct

@@ -81,12 +81,9 @@ const Invoice = () => {
     const history = useHistory()
     const user = JSON.parse(localStorage.getItem('profile'))
 
-
     useEffect(() => {
         getTotalCount()
-         // eslint-disable-next-line
     },[location])
-
 
     const getTotalCount = async() => {
         try {
@@ -99,9 +96,6 @@ const Invoice = () => {
         }
       }
       
-
-
-
     useEffect(() => {
         dispatch(getInvoice(id));
         // eslint-disable-next-line

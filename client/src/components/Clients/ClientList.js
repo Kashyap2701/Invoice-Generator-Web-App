@@ -19,22 +19,10 @@ const ClientList = () => {
     const user = JSON.parse(localStorage.getItem('profile'))
     const {clients} = useSelector((state) => state.clients)
     const isLoading = useSelector(state => state.clients.isLoading)
-    // const clients = []
 
-    
-    // useEffect(() => {
-    // }, [currentId, dispatch]);
-    
-//     useEffect(() => {
-//         dispatch(getClients(1));
-//         // dispatch(getClientsByUser({userId : user?.result?._id}));
-//         // dispatch(getClientsByUser({ search :user?.result?._id, tags: tags.join(',') }));
-//     },[location]
-// )
-
-useEffect(() => {
-    dispatch(getClientsByUser({ search: user?.result?._id || user.result.googleId }));
-  },[location, dispatch])
+    useEffect(() => {
+      dispatch(getClientsByUser({ search: user?.result?._id || user.result.googleId }));
+    },[location, dispatch])
 
   if(!user) {
     history.push('/login')

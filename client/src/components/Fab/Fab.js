@@ -5,6 +5,7 @@ import 'react-tiny-fab/dist/styles.css';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import ProductIcon from '@material-ui/icons/AddBoxRounded';
 import AddClient from '../Invoice/AddClient';
 
 
@@ -19,7 +20,7 @@ const FabButton = () => {
 
     return (
         <div>
-           <AddClient setOpen={setOpen} open={open} />
+          <AddClient setOpen={setOpen} open={open} />
           <Fab
             mainButtonStyles={mainButtonStyles}
             icon={ <AddIcon />}
@@ -29,10 +30,9 @@ const FabButton = () => {
             {location.pathname !== '/invoice' && (
               <Action
                   text="New Invoice"
-                  // onClick={() =>  history.push(`/invoice`)}
                   onClick={() => window.location.href='/invoice'}
-                >
-                  <CreateIcon />
+              >
+                <CreateIcon />
               </Action>
             )}
 
@@ -42,6 +42,13 @@ const FabButton = () => {
               >
                 <PersonAddIcon />
             </Action>
+
+            {/* <Action
+                text="New Product"
+                onClick={() => setOpen((prev) => !prev)}
+              >
+                <ProductIcon   />
+            </Action> */}
 
           </Fab>
         </div>

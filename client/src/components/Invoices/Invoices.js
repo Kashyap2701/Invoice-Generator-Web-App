@@ -27,6 +27,8 @@ import { deleteInvoice, getInvoicesByUser } from '../../actions/invoiceActions';
 import NoData from '../svgIcons/NoData';
 import Spinner from '../Spinner/Spinner'
 import { useSnackbar } from 'react-simple-snackbar'
+import Searchbar from '../SearchBar.js/Searchbar';
+import FabButton from '../Fab/Fab';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -118,21 +120,13 @@ const Invoices = () => {
   const location = useLocation()
   const history = useHistory()
   const user = JSON.parse(localStorage.getItem('profile'))
-  const rows = useSelector(state => state.invoices.invoices)
+  const rows = useSelector(state => state.invoices.invoices);
   const isLoading = useSelector(state => state.invoices.isLoading)
-        // eslint-disable-next-line 
+  const [filteredInvoices,setFilteredInvoices] = useState(null);
   const [openSnackbar, closeSnackbar] = useSnackbar()
-
-  // const rows = []
-
-
-    // useEffect(() => {
-    //     dispatch(getInvoices());
-    // }, [dispatch]);
 
     useEffect(() => {
       dispatch(getInvoicesByUser({ search: user?.result?._id || user?.result?.googleId}));
-      // eslint-disable-next-line
     },[location])
 
 
@@ -144,8 +138,20 @@ const Invoices = () => {
   const classes = useStyles2();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(rows.length);
-
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+  const handleSearchQuery = (e) => {
+    const searchQuery = e.target.value;
+    console.log(e.target.value);
+    if(searchQuery.length==0)
+      setFilteredInvoices(null);
+    else setFilteredInvoices(rows.filter(row=>{
+      if(row.invoiceNumber==searchQuery)
+        return row;
+      else if(row.client.name.toLowerCase().includes(searchQuery))
+        return row;
+    }));
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -195,74 +201,77 @@ const Invoices = () => {
   
   return (
     <div>
+
     <Container style={{width: '85%', paddingTop: '70px', paddingBottom: '50px', border: 'none'}} >
-        <TableContainer component={Paper} elevation={0}>
-      <Table className={classes.table} aria-label="custom pagination table">
+      <Searchbar label={'Search invoice (Client/ID)'} handleSearch={handleSearchQuery}/>
+      <TableContainer component={Paper} elevation={0}>
+        <Table className={classes.table} aria-label="custom pagination table">
 
-      <TableHead>
-          <TableRow>
-            <TableCell style={headerStyle}>Number</TableCell>
-            <TableCell style={headerStyle}>Client</TableCell>
-            <TableCell style={headerStyle}>Amount</TableCell>
-            <TableCell style={headerStyle}>Due Date</TableCell>
-            <TableCell style={headerStyle}>Status</TableCell>
-            <TableCell style={headerStyle}>Edit</TableCell>
-            <TableCell style={headerStyle}>Delete</TableCell>
-          </TableRow>
-        </TableHead>
+        <TableHead>
+            <TableRow>
+              <TableCell style={headerStyle}>Number</TableCell>
+              <TableCell style={headerStyle}>Client</TableCell>
+              <TableCell style={headerStyle}>Amount</TableCell>
+              <TableCell style={headerStyle}>Due Date</TableCell>
+              <TableCell style={headerStyle}>Status</TableCell>
+              <TableCell style={headerStyle}>Edit</TableCell>
+              <TableCell style={headerStyle}>Delete</TableCell>
+            </TableRow>
+          </TableHead>
 
-        <TableBody>
-          {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
-          ).map((row) => (
-            <TableRow key={row._id} style={{cursor: 'pointer'}} >
-                <TableCell style={tableStyle} onClick={() => openInvoice(row._id)}> {row.invoiceNumber} </TableCell>
-                <TableCell  style={tableStyle} onClick={() => openInvoice(row._id)} > {row.client.name} </TableCell>
-                <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} >{row.currency} {row.total? toCommas(row.total): row.total} </TableCell>
-                <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} > {moment(row.dueDate).fromNow()} </TableCell>
-                <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} > <button style={checkStatus(row.status)}>{row.status}</button></TableCell>
-             
+          <TableBody>
+            {(rowsPerPage > 0
+              ? (filteredInvoices || rows).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredInvoices || rows
+            ).map((row) => (
+              <TableRow key={row._id} style={{cursor: 'pointer'}} >
+                  <TableCell style={tableStyle} onClick={() => openInvoice(row._id)}> {row.invoiceNumber} </TableCell>
+                  <TableCell  style={tableStyle} onClick={() => openInvoice(row._id)} > {row.client.name} </TableCell>
+                  <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} >{row.currency} {row.total? toCommas(row.total): row.total} </TableCell>
+                  <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} > {moment(row.dueDate).fromNow()} </TableCell>
+                  <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} > <button style={checkStatus(row.status)}>{row.status}</button></TableCell>
+              
+                  <TableCell style={{...tableStyle, width: '10px'}}>
+                    <IconButton onClick={() => editInvoice(row._id)}>
+                      <BorderColorIcon  style={{width: '20px', height: '20px'}} />
+                    </IconButton>
+                </TableCell>
                 <TableCell style={{...tableStyle, width: '10px'}}>
-                  <IconButton onClick={() => editInvoice(row._id)}>
-                    <BorderColorIcon  style={{width: '20px', height: '20px'}} />
-                  </IconButton>
-              </TableCell>
-              <TableCell style={{...tableStyle, width: '10px'}}>
-                  <IconButton onClick={() => dispatch(deleteInvoice(row._id, openSnackbar))}>
-                    <DeleteOutlineRoundedIcon  style={{width: '20px', height: '20px'}} />
-                  </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+                    <IconButton onClick={() => dispatch(deleteInvoice(row._id, openSnackbar))}>
+                      <DeleteOutlineRoundedIcon  style={{width: '20px', height: '20px'}} />
+                    </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
 
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={6}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={6}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+          </TableFooter>
+        </Table>
+      </TableContainer>
     </Container>
+    <FabButton/>
   </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, {useState } from 'react';
-import { useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux';
+import Searchbar from '../SearchBar.js/Searchbar';
 import styles from './Clients.module.css'
-// import moment from 'moment'
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -23,9 +23,9 @@ import DeleteOutlineRoundedIcon from '@material-ui/icons/DeleteOutlineRounded';
 import BorderColorIcon from '@material-ui/icons/BorderColor';
 import { Button } from '@material-ui/core';
 import { useSnackbar } from 'react-simple-snackbar'
-
 import { deleteClient } from '../../actions/clientActions';
-// import clients from '../../clients.json'
+import FabButton from '../Fab/Fab';
+
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -94,8 +94,6 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-
-
 const useStyles2 = makeStyles(theme => ({
   table: {
     minWidth: 500,
@@ -112,8 +110,9 @@ const Clients = ({ setOpen, setCurrentId, clients }) => {
   const classes = useStyles2();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(clients.length);
-      // eslint-disable-next-line 
-      const [openSnackbar, closeSnackbar] = useSnackbar()
+  // eslint-disable-next-line 
+  const [openSnackbar, closeSnackbar] = useSnackbar();
+  const [filteredClients,setFilteredClients] = useState(null);
 
   const dispatch = useDispatch()
   const rows = clients
@@ -131,10 +130,21 @@ const Clients = ({ setOpen, setCurrentId, clients }) => {
 
 
   const handleEdit = (selectedInvoice) => {
-    
     setOpen((prevState) => !prevState)
     setCurrentId(selectedInvoice)
+  }
 
+  const handleSearchQuery = (e) => {
+    const searchQuery = e.target.value;
+    // console.log(e.target.value);
+    if(searchQuery.length==0)
+      setFilteredClients(null);
+    else setFilteredClients(rows.filter((row,index)=>{
+      if((index+1)==searchQuery)
+        return row;
+      else if(row.name.toLowerCase().includes(searchQuery))
+        return row;
+    }));
   }
 
 
@@ -145,7 +155,9 @@ const headerStyle = { borderBottom: 'none', textAlign: 'center'}
   return (
     <div className={styles.pageLayout}>
     <Container style={{width: '85%'}}>
-        <TableContainer component={Paper} elevation={0}>
+
+    <Searchbar label={'Search Client (Name/ID)'} handleSearch={handleSearchQuery}/>
+      <TableContainer component={Paper} elevation={0}>
       <Table className={classes.table} aria-label="custom pagination table">
 
       <TableHead>
@@ -162,8 +174,8 @@ const headerStyle = { borderBottom: 'none', textAlign: 'center'}
 
         <TableBody>
           {(rowsPerPage > 0
-            ? rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
+            ? (filteredClients || rows)?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : (filteredClients || rows)
           ).map((row, index) => (
             <TableRow key={row._id} styel={{cursor: 'pointer'}} >
               <TableCell style={{...tableStyle, width: '10px'}}>{index + 1}</TableCell>
@@ -210,6 +222,7 @@ const headerStyle = { borderBottom: 'none', textAlign: 'center'}
       </Table>
     </TableContainer>
     </Container>
+    <FabButton/>
     </div>
   );
 }
