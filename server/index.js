@@ -53,12 +53,14 @@ var options = { format: 'A4' };
 app.post('/send-pdf', (req, res) => {
     const { email, company } = req.body
 
+    console.log(email,company);
+
     // pdf.create(pdfTemplate(req.body), {}).toFile('invoice.pdf', (err) => {
     pdf.create(pdfTemplate(req.body), options).toFile('invoice.pdf', (err) => {
        
           // send mail with defined transport object
         transporter.sendMail({
-            from: ` Accountill <hello@accountill.com>`, // sender address
+            from: ` ${company.businessName} <${company.email}>`, // sender address
             to: `${email}`, // list of receivers
             replyTo: `${company.email}`,
             subject: `Invoice from ${company.businessName ? company.businessName : company.name}`, // Subject line
@@ -73,7 +75,7 @@ app.post('/send-pdf', (req, res) => {
         if(err) {
             res.send(Promise.reject());
         }
-        res.send(Promise.resolve());
+        res.send('OK');
     });
 });
 

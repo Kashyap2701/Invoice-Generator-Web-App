@@ -123,7 +123,6 @@ hr {
     <body>
         <div class="layout">
         <div class="content">
-            <img src=${company.logo} class="logo" />
             <h1 class="name">${company.businessName ? company.businessName : company.name}</h1>
             
               <hr>
@@ -146,13 +145,6 @@ hr {
                   
               </div>
         </div>
-        
-      <div class"footer">
-          <a href="https://accountill.com">
-          <img class="footer-logo" src="https://i.postimg.cc/hGZKzdkS/logo.png" alt="arc-invoice"/>
-        </a>
-      </div>
-    <p style="text-align: center">Make beautiful invoice for free at accountill.com</p>
     </div>
     </body>
 </html>`

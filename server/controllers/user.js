@@ -120,7 +120,7 @@ export const forgotPassword = (req,res)=>{
             user.save().then((result)=>{
                 transporter.sendMail({
                     to:user.email,
-                    from:"Accountill <hello@accountill.com>",
+                    from:"Kashyap <kashyap@accountill.com>",
                     subject:"Password reset request",
                     html:`
                     <p>You requested for password reset from Arc Invoicing application</p>
